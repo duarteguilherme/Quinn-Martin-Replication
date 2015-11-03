@@ -8,7 +8,7 @@
 #### LOADING PACKAGES AND SETTING FOLDER
 library(dplyr)
 library(rstan)
-setwd('~/Documentos/R/Quinn-Martin-Replication/')
+setwd('~/Documents/R/Quinn-Martin-Replication/')
 
 
 
@@ -106,7 +106,7 @@ colnames(vec) <- c("in_ter", "fi_ter")
 
 n_cas <- length(unique(yy$cas))
 n_jus <- length(unique(yy$jus))
-n_par <- length(unique(yy$par)) # There is a parameter for term and justice, so we have to offer it to the compiler
+n_par <- length(unique(yy$par)) # There is a parameter for term and justice
 
 
 
@@ -154,31 +154,31 @@ model {
   }
   for (j in 1:njus) {
     if ( j == 3 ) {
-      x[in_ter[j]] ~ normal(-3,.01); // Justice Douglas, term=0, set prior to normal(-3,.01)
+      x[in_ter[j]] ~ normal(-3,.1); // Justice Douglas, term=0, set prior to normal(-3,.01)
     }
     else if ( j == 1 ) {
-      x[in_ter[j]] ~ normal(1,.01); // Justice Harlam, term=0, set prior to normal(1,.01)
+      x[in_ter[j]] ~ normal(1,.1); // Justice Harlam, term=0, set prior to normal(1,.01)
     }
     else if ( j == 5 ) {
-      x[in_ter[j]] ~ normal(-2,.01); // Justice Marshall, term=0, set prior to normal(-2,.01)
+      x[in_ter[j]] ~ normal(-2,.1); // Justice Marshall, term=0, set prior to normal(-2,.01)
     }
     else if ( j == 6 ) {
-      x[in_ter[j]] ~ normal(-2,.01); // Justice Brennan, term=0, set prior to normal(-2,.01)
+      x[in_ter[j]] ~ normal(-2,.1); // Justice Brennan, term=0, set prior to normal(-2,.01)
     }
     else if ( j == 10 ) {
-      x[in_ter[j]] ~ normal(1,.01); // Justice Frankfurter, term=0, set prior to normal(1,.01)
+      x[in_ter[j]] ~ normal(1,.1); // Justice Frankfurter, term=0, set prior to normal(1,.01)
     }
     else if ( j == 14 ) {
-      x[in_ter[j]] ~ normal(-1,.01); // Justice Fortas, term=0, set prior to normal(-1,.01)
+      x[in_ter[j]] ~ normal(-1,.1); // Justice Fortas, term=0, set prior to normal(-1,.01)
     }
     else if ( j == 21 ) {
-      x[in_ter[j]] ~ normal(2,.01); // Justice Rehnquist, term=0, set prior to normal(2,.01)
+      x[in_ter[j]] ~ normal(2,.1); // Justice Rehnquist, term=0, set prior to normal(2,.01)
     }
     else if ( j == 24 ) {
-      x[in_ter[j]] ~ normal(2.5,.01); // Justice Scalie, term=0, set prior to normal(2.5,.01)
+      x[in_ter[j]] ~ normal(2.5,.1); // Justice Scalie, term=0, set prior to normal(2.5,.01)
     }
     else if ( j == 27 ) {
-      x[in_ter[j]] ~ normal(2.5,.01); // Justice Thomas, term=0, set prior to normal(2.5,.01)
+      x[in_ter[j]] ~ normal(2.5,.1); // Justice Thomas, term=0, set prior to normal(2.5,.01)
     }
 
     else { 
@@ -186,11 +186,28 @@ model {
     }
     if ( in_ter[j]!=fi_ter[j]) { 
       for (k in (in_ter[j]+1):fi_ter[j]) {
-        x[k] ~ normal(x[k-1],sigma[j]);
+        x[k] ~ normal(x[k-1],.01);
       }
     }
   }
   
 }
 '
-fit <- stan(model_code = stanstr, data=data, iter=100000, warmup=20000, thin=10, chains=1)
+fit <- stan(model_code = stanstr, data=data, iter=1000, warmup=20, thin=10, chains=1)
+
+
+la <- extract(fit, permuted = TRUE)
+
+x <- la$x
+x <- apply(x, 2, mean)
+
+
+results <- matrix(NA, ncol=length(unique(yy$ter)), nrow=n_jus)
+
+for (i in 1:29) {
+  for (j in 1:47) {
+    pare <- yy$par[yy$jus==i & yy$ter==j][1]
+    if ( length(pare)!=0) 
+      results[i,j] <- x[pare]
+  }
+}
