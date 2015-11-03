@@ -110,7 +110,7 @@ n_par <- length(unique(yy$par)) # There is a parameter for term and justice
 
 
 
-
+yy$par <- as.numeric(yy$par)
 
 
 ###################################
@@ -211,3 +211,19 @@ for (i in 1:29) {
       results[i,j] <- x[pare]
   }
 }
+
+
+harlam <- results[1,]
+plot(index=1:47, harlam, type="l")
+
+rehnquist <- results[21,]
+plot(index=1:47, rehnquist, type="l")
+
+harlam <- results[24,]
+plot(index=1:47, harlam, type="l")
+
+harlam <- results[1,]
+plot(index=1:47, harlam, type="l")
+
+harlam <- results[1,]
+plot(index=1:47, harlam, type="l")
