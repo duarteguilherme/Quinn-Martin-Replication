@@ -48,6 +48,11 @@ for (i in 1:length(list_terms_files)) {
 }
 
 
+# Setting initial term to 1 for every justice
+
+
+  
+
 # It's not easy to get along with missing data on Stan as it is on Jags so we must transform data
 yy <- matrix(NA, ncol=4, nrow=(3450*29))
 colnames(yy) <- c("cas","jus","y", "ter")
@@ -64,6 +69,12 @@ for (i in 1:3450) {
 yy <- data.frame(yy)
 yy <- filter(yy, y!=9)
 yy <- na.omit(yy)
+
+# Setting initial terms to 1 for every justice
+yy <- yy %>%
+  group_by(jus) %>%
+  mutate(ter=(ter-min(ter)+1))
+
 
 
 T <- length(unique(yy$ter)) # number of terms
@@ -127,7 +138,7 @@ stanstr <-
   }
   parameters {
   vector[2] alpha_beta[K];        // position and discrim of case k
-  vector[J] theta[T];             // position in term t of justice j
+  vector[J] theta[T];            // position in term t of justice j
   }
   model {
   for (n in 1:N)
@@ -141,4 +152,17 @@ stanstr <-
   theta[t] ~ normal(theta[t - 1], delta[t - 1]);
   }
   '
-  fit <- stan(model_code = stanstr, data=data, iter=1000, warmup=20, thin=10, chains=1)
+  fit <- stan(model_code = stanstr, data=data, iter=3000, warmup=200, thin=10, chains=1)
+
+
+
+parameters <- extract(fit)
+
+
+theta <- parameters$theta
+theta2 <- apply(theta, c(2,3), mean)
+
+str(theta2)
+
+
+plot( c(1953:1999), theta2[,27], type="l" )
