@@ -1,0 +1,28 @@
+---
+title: "Dynamic Linear Model and Ideal Point Estimation"
+author: "Guilherme Jardim Duarte"
+date: "17 de junho de 2016"
+output:
+  html_document:
+    highlight: tango
+    number_sections: yes
+    theme: united
+    toc: yes
+  pdf_document:
+    toc: yes
+  word_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+This is a case study and tutorial regarding how to write an Ideal Points Model which varies in time for Political Science in Political Science. It consists of four parts. Firsly, we will explain what is an Ideal Point Model. We will replicate the paper "Dynamic Ideal Point Estimation via Markov Chain Monte Carlo for the U.S. Supreme Court, 1953–1999", by Andrew D. Martin and Kevin M. Quinn, published in Political Analysis - 2001.
+
+# Introduction 
+
+## Ideal Point Modeling
+
+Ideal Point Models are a common model for 
