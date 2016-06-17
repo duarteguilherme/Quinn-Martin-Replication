@@ -25,4 +25,9 @@ This is a case study and tutorial regarding how to write an Ideal Points Model w
 
 ## Ideal Point Modeling
 
-Ideal Point Models are a common model for 
+Ideal Point Models are a common model for Political Science. They assume that politicans have preferences represented by utility functions to a vectorial space of $\mathbb{R}$. So, for example, we have two congressmen A and B, and they have to decide about one issue, we could think about this situation this way:
+
+```{r, echo=FALSE}
+library(ggplot2)
+```
+
