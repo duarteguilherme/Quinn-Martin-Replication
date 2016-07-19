@@ -20,32 +20,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-This is a case study and tutorial regarding how to write an Ideal Points Model which varies in time for Political Science in Political Science. It consists of four parts. Firsly, we will explain what is an Ideal Point Model and what extent a Item Response Theory is related to it. Then, we will replicate the paper "Dynamic Ideal Point Estimation via Markov Chain Monte Carlo for the U.S. Supreme Court, 1953–1999", by Andrew D. Martin and Kevin M. Quinn, published in Political Analysis - 2001 [@martin2002dynamic].
+This is a case study and tutorial regarding how to code a Dynamic Bayesian Item Response Theory for Ideal Points in Political Science. We will replicate the paper "Dynamic Ideal Point Estimation via Markov Chain Monte Carlo for the U.S. Supreme Court, 1953–1999", by Andrew D. Martin and Kevin M. Quinn, published in Political Analysis - 2001 [@martin2002dynamic]. It consists of four parts. Firsly, we will explain what is an Ideal Point Model and what extent a Item Response Theory is related to it. Then, 
 
 # Introduction 
 
 ## Ideal Point Modeling and IRT Estimation
 
-Ideal Point Models are a common mofig.width=6, fig.height=2.5del for Political Science. They assume that politicans have preferences represented by utility functions in a vectorial space of $\mathbb{R}$. In this model, one actor A will choose between two alternatives x (change policy) and y (status quo) according to their distance from his ideal point. Suppose, for example, two congressmen, A and B, are called to vote an issue laid down to allow abortion in cases of rape and serious harm to woman's body in a country where ending pregnancy is a serious crime . The first one strongly opposes abortion, whereas the second one is favorable to it in any case. Consider the following graph. 
-```{r, echo=FALSE,fig.width=6, fig.height=3.5}
-library(ggplot2)
+Ideal Point Models are standard models in Political Science. They assume that politicans have preferences represented by utility functions in a vectorial space of $\mathbb{R}$. According to those models, one actor A will choose between two alternatives x (change policy) and y (status quo) through their distance from his ideal point. Suppose, for example, two congressmen, A and B, are called to vote an issue laid down to allow abortion in cases of rape and serious harm to woman's body in a country where ending pregnancy is a serious crime . The first one strongly opposes abortion, whereas the second one is favorable to it in any case. Suppose in status quo abortions are not allowed in any situation. In this case, congressman A will oppose the change, while congressman B will vote for it.
 
-plot1 <- ggplot() 
-plot1 + 
-  geom_vline(xintercept=c(1,5), linetype='longdash', colour='gray') + 
-  geom_vline(xintercept=c(2), colour='red') + 
-  geom_vline(xintercept=c(3), colour='green') +
-  geom_errorbarh(aes(x=1,y=1, xmax= 2 , xmin=1, height = .5), colour='black') + 
-  geom_errorbarh(aes(x=1,y=1, xmax= 3 , xmin=2, height = .5), colour='black') + 
-  geom_errorbarh(aes(x=1,y=1, xmax= 5 , xmin=3, height = .5), colour='black') + 
-    coord_fixed(xlim=c(0,6), ylim=c(0,6)) +
-  annotate("text",x=1.5,y=.7,label="d1") +
-  annotate("text",x=2.5,y=.7,label="d2") +
-  annotate("text",x=4,y=.7,label="d3") + xlab("") + ylab("") +
-  theme_minimal()
+For a formalization of the Ideal Model Point, the reader would like to see [clinton2004statistical] or [@martin2002dynamic].
 
-```
+We employ Item Response Theory Model here to estimate those latent ideal point estimation. We will model the probability of voting 1 (yea) or 0 (nay) is given by $y_{ij}$, in which $i$ stands for the rollcall and $j$ for the politician. The model is represented by: $$y_{ij} = \alpha_i - \beta_i * \theta_j $$
 
-Here it is illustrated the ideal point model in one dimension. We did not employ specific forms of utility functions. A and B ideal points are represent by longdash gray lines, whereas 'status quo' and 'new law' respectively by red and green line. The distance between the ideal point of A and 'status quo' is d1 and between A and 'new law' is d1 + d2. So, in this case, A is supposed to vote for maintain the status quo and strike down the issue. On the contrary, B will favor the 'new law' because it is close to his ideal point (d3) and will not support 'status quo' because his distance to it is d3 + d2.
 
-The goal of Item Response Theory Model here is estimate those latent ideal point estimation.
