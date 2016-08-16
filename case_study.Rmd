@@ -28,8 +28,51 @@ This is a case study and tutorial regarding how to code a Dynamic Bayesian Item 
 
 Ideal Point Models are standard models in Political Science. They assume that politicans have preferences represented by utility functions in a vectorial space of $\mathbb{R}$. According to those models, one actor A will choose between two alternatives x (change policy) and y (status quo) through their distance from his ideal point. Suppose, for example, two congressmen, A and B, are called to vote an issue laid down to allow abortion in cases of rape and serious harm to woman's body in a country where ending pregnancy is a serious crime . The first one strongly opposes abortion, whereas the second one is favorable to it in any case. Suppose in status quo abortions are not allowed in any situation. In this case, congressman A will oppose the change, while congressman B will vote for it.
 
-For a formalization of the Ideal Model Point, the reader would like to see [clinton2004statistical] or [@martin2002dynamic].
+For a formalization of the Ideal Model Point, the reader would like to see [@clinton2004statistical] or [@martin2002dynamic].
 
-We employ Item Response Theory Model here to estimate those latent ideal point estimation. We will model the probability of voting 1 (yea) or 0 (nay) is given by $y_{ij}$, in which $i$ stands for the rollcall and $j$ for the politician. The model is represented by: $$y_{ij} = \alpha_i - \beta_i * \theta_j $$
+We employ Item Response Theory Model here to estimate those latent ideal point estimation. We will model the probability of voting 1 (yea) or 0 (nay) is given by $y_{ij}$, in which $i$ stands for the rollcall and $j$ for the politician. The model is represented by: $$y_{ij} = \alpha_i + \beta_i \theta_j $$
+
+## The Model
+
+In their paper, Andrew D. Martin and Kevin Quinn, employed bayesian dynamic IRT for estimating ideal points for justices of the US Supreme Court. They programmed the model in C++ with  Scythe Statistical Library and ran it in Linux Workstations. We replicated it using Stan.
+
+The model is exposed as follows. Let $k$ denote a case being judged in a certain time, $j$, a specific justice, and $t$, a certain term. We model each justice's vote as: $$z_{t,k,j} = \alpha_{k} + \beta_{k}\theta_{t,j}  + \epsilon_{t,k,j}$$, such that $z_{t,k,j}$ is vote yea($1$) or nay($0$), $\theta{t,j}$, the ideal point for justice j at the term t, and $\epsilon_{t,k,j}$, an error disturbance.
+
+We define normal distributions with mean 0  and variance 1 as priors for $\beta_k$ and $\alpha_k$   $$\beta_k \sim N(0,1) \\ \alpha_k \sim N(0,1) $$
+
+The $\theta_{t=t_1,j}$ parameters have priors $\theta_{t=t_1,j} \sim N(0,1)$ with the exception of those justices whose parameters are treated in order to solve identification issues. Among those justices, we have:
+
+  * Justice Harlam: $\theta_{t=t_1,j} \sim N(1,.01)$
+  * Justice Douglas: $\theta_{t=t_1,j} \sim N(-3,.01)$
+  * Justice Marshall: $\theta_{t=t_1,j} \sim N(-2,.01)$
+  * Justice Brennan: $\theta_{t=t_1,j} \sim N(-2,.01)$
+  * Justice Frankfurter: $\theta_{t=t_1,j} \sim N(1,.01)$
+  * Justice Fortas: $\theta_{t=t_1,j} \sim N(-1,.01)$
+  * Justice Rehnquist: $\theta_{t=t_1,j} \sim N(2,.01)$
+  * Justice Scalia: $\theta_{t=t_1,j} \sim N(2.5,.01)$
+  * Justice Thomas: $\theta_{t=t_1,j} \sim N(2.5,.01)$
 
 
+Notice that $t_1$ refers to the first term a justice is present, since they are not supposed to have started at the same terms.
+
+Other $\theta_{t,j}$ parameters have their priors defined according to the previous one in this way: $$ \theta_{t,j} \sim N(\theta_{t-1,j}, \Delta_{\theta_{t,j}})$$ This guarantees that dynamicity of the model, because the parameter for a justice in a $t$ term depends on the  parameter in $t-1$ term. An important feature to notice is that not every justice votes in every term, although the notation doesn't allow us to conclude that. This will be relevant from the programming point of view, since Stan doesn't accept NA data.
+
+Finally, the $\Delta_{\theta_{t,j}}$ values are set to $0.01$, with the exception of Justice Douglas, whose value was set to $0.001$.
+
+
+
+# Running the Model
+
+
+## Data
+
+We employ the same data used by Andrew D. Martin and Kevin M. Quinn in their paper. We prepared the data and it's included in the file 'votes.csv'.
+
+```{r,message=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+votes <- read_csv('votes.csv')
+str(votes)
+
+```
